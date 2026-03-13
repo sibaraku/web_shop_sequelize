@@ -4,19 +4,26 @@ const bodyParser = require('body-parser');
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 
+const productAdminRoutes = require("./routes/admin/products");
+app.use("/admin", productAdminRoutes);
+
+const productRoutes = require("./routes/products");
+app.use(productRoutes);
+
 const sequelize = require('./util/db');
+const models = require("./models/index");
+sequelize.models = models;
 
 sequelize
-    .authenticate()
-    .then(() => {
-        console.log('Connection has been established successfully.');
-    })
-    .catch(err => {
-        console.error('Unable to connect to the database:', err);
+    .sync()
+  .then(() => {
+    console.log("Tabelid loodud");
+    app.listen(3002, () => {
+      console.log("server is running on http://localhost:3002");
     });
+  })
+  .catch((error) => console.error("Error connecting to database", error));
 
-app.get('/', (req, res) => {
-    res.json({message: 'web shop app'});
+app.get("/", (req, res) => {
+  res.send({ message: "web shop app" });
 });
-
-app.listen(3002);
