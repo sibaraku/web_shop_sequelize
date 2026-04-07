@@ -2,7 +2,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 
 const app = express();
-
+app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 const sequelize = require("./util/db");
@@ -24,6 +24,8 @@ app.use("/admin", productAdminRoutes);
 
 const productRoutes = require("./routes/products");
 app.use(productRoutes);
+const shopRoutes = require("./routes/shop");
+app.use(shopRoutes);
 
 sequelize
   .sync({})
@@ -40,8 +42,12 @@ sequelize
     return user;
   })
   .then((user) => {
-    console.log(user)
-    app.listen(3002);
+    return user.createCart();
+  })
+  .then((cart) => {
+    app.listen(3002, () => {
+      console.log("server is running on http://localhost:3002");
+    });
   })
   .catch((error) => console.error("Error connecting to database", error));
 
